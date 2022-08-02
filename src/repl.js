@@ -33,114 +33,58 @@ const put_env = (env, name, value) => {
 }
 
 
+//-------------------- tokenize --------------------
+
+const tokens = [{type: 'kw', value: 'if'}, {type: 'punc', value: '('}]
+
+const numRege = /[0-9]/
+const idRege = /[_a-zA-Z0-9]/
+const idStartReg = /[_a-zA-Z]/
+
+
+function tokenize(input) {
+
+    let i = 0
+    let tokens = []
+    while(i < input.length) {
+        if (numRege.test(input[i])) {
+            let num = ''
+            while(numRege.test(input[i]) && i < input.length) {
+                num+=input[i]
+                i++
+            }
+            tokens.push({
+                type: 'num',
+                value: num
+            })
+            i++
+        } else if (idStartReg.test(input[i])) {
+            let id = ''
+            while(idRege.test(input[i]) && i < input.length) {
+                id+=input[i]
+                i++
+            }
+            tokens.push({
+                type: 'id',
+                value: id
+            })
+            i++
+        } else {
+            i++
+        }
+    }
+    return tokens
+}
+
+
+//-------------------- parser --------------------
+
 
 function parse(input) {
 
 
-    const el2 = {
-        type: 'num',
-        value: 100
-    }
-
-    const el4 = {
-        type: 'name',
-        name: 'name'
-    }
-
-    const el5 = {
-        type: 'assign',
-        name: 'name',
-        value: {
-            type: 'num',
-            value: 'hello summer, maybe it is y'
-        },
-    }
-
-    const el3 = {
-        type: 'block',
-        exprs: [
-            el5,
-            el4
-        ]
-    }
-
-    const el1 = {
-        type: "lambda",
-        params: [
-
-        ],
-        body: [
-            el5,
-            el4
-        ]
-    }
-
-    const el6 = {
-        type: 'apply',
-        func: {
-            type: 'name',
-            name: 'fn1'
-        },
-        args: [],
-    }
-
-    const el9 = {
-        type: 'block',
-        exprs: [
-            {
-                type: 'assign',
-                name: 'fn1',
-                value: el1
-            },
-            el6
-        ]
-    }
 
 
-    const eltest = {
-        type: 'apply',
-        func: {
-            type: 'lambda',
-            args: [
-                {
-                    name: 'a'
-                },
-                {
-                    name: 'b'
-                }
-            ],
-            body: {
-                type: 'block',
-                exprs: [
-                    {
-                        type: 'op',
-                        op: '+',
-                        left: {
-                            type: 'name',
-                            name: 'a'
-                        },
-                        right: {
-                            type: 'name',
-                            name: 'b'
-                        }
-
-                    }
-                ]
-            }
-        },
-        args: [
-            {
-                type: 'num',
-                value: 1
-            },
-            {
-                type: 'num',
-                value: 4
-            }
-        ]
-    }
-
-    return eltest
 }
 
 const root_env = make_env(null)
@@ -149,6 +93,14 @@ const root_env = make_env(null)
 
 function list_of_values(elements = [], env) {
     return elements.map(element => eval(element, env), elements)
+}
+
+function eval_assignment(element, env) {
+    const value = eval(element.right)
+    assign(element.right, value, env)
+
+    // 返回右边的值
+    return value
 }
 
 
@@ -179,6 +131,8 @@ function eval(element, env) {
             return get_env(env, element.name);
         case 'apply':
             return apply(eval(element.func, env), list_of_values(element.args, env))
+        case 'cond':
+            return eval(element.pre, env) === true ? eval(element.ifCond, env) : eval(element.thenCond, env)
         case 'op':
             return eval(element.left, env) + eval(element.right, env)
         case 'assign':
@@ -204,5 +158,8 @@ function make_lambda(element, parent_env) {
         env
     }
 }
-const result = eval(parse('123'), root_env)
+
+
+const result = tokenize('123asdf')
+
 console.log(result)
