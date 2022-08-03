@@ -35,46 +35,130 @@ const put_env = (env, name, value) => {
 
 //-------------------- tokenize --------------------
 
-const tokens = [{type: 'kw', value: 'if'}, {type: 'punc', value: '('}]
+const tokens = [{ type: 'kw', value: 'if' }, { type: 'punc', value: '(' }]
 
 const numRege = /[0-9]/
 const idRege = /[_a-zA-Z0-9]/
 const idStartReg = /[_a-zA-Z]/
 
 
-function tokenize(input) {
-
+function char_stream(input = '') {
     let i = 0
-    let tokens = []
-    while(i < input.length) {
-        if (numRege.test(input[i])) {
-            let num = ''
-            while(numRege.test(input[i]) && i < input.length) {
-                num+=input[i]
-                i++
-            }
-            tokens.push({
-                type: 'num',
-                value: num
-            })
-            i++
-        } else if (idStartReg.test(input[i])) {
-            let id = ''
-            while(idRege.test(input[i]) && i < input.length) {
-                id+=input[i]
-                i++
-            }
-            tokens.push({
-                type: 'id',
-                value: id
-            })
-            i++
-        } else {
-            i++
+    let line = 1, row = 1
+
+    function next() {
+        const ch = peek()
+        if (eof()) {
+            return ch
         }
+        if (ch === "\n") {
+            line++
+        }
+        row++
+        i++
+        return ch
     }
-    return tokens
+
+    function peek() {
+        return input.charAt(i)
+    }
+
+    function eof() {
+        return peek() === ''
+    }
+
+    function error() {
+
+    }
+    return {
+        next,
+        peek,
+        eof,
+        error
+    }
+
 }
+
+
+function tokenizer(cs = char_stream('')) {
+
+    function is_space(ch) {
+        return /\s/.test(ch)
+    }
+
+    function is_num(ch) {
+        return /[0-9]/.test(ch)
+    }
+
+    function is_id_start(ch) {
+        return /[_a-zA-Z]/.test(ch)
+    }
+
+    function is_id(ch) {
+        return /[_a-zA-Z0-9]/.test(ch)
+    }
+
+    function read_while(predic) {
+        let str = ''
+        while (!cs.eof() && predic(cs.peek())) {
+            str += cs.next()
+        }
+        return str
+    }
+
+
+    function next() {
+        if (eof()) {
+            return cur
+        }
+        read_while(is_space)
+        const ch = cs.peek()
+        if (is_num(ch)) {
+            const value = read_while(is_num)
+            return {
+                type: 'num',
+                value
+            }
+        } else if (is_id_start(ch)) {
+            return {
+                type: 'id',
+                value: read_while(is_id)
+            }
+        }
+
+        return 'no';
+    }
+
+    function peek() {
+        return cur ? cur : next()
+    }
+
+
+    function error() {
+
+    }
+
+    function eof() {
+        return cs.eof()
+    }
+
+    return {
+        peek,
+        next,
+        eof,
+        error
+    }
+}
+
+
+const t = tokenizer(char_stream('123  1234'))
+
+while (!t.eof()) {
+    const i = t.next()
+    console.log(i)
+}
+
+
 
 
 //-------------------- parser --------------------
@@ -160,6 +244,8 @@ function make_lambda(element, parent_env) {
 }
 
 
-const result = tokenize('123asdf')
+// const result = tokenize('123asdf')
 
-console.log(result)
+// console.log(result)
+
+//console.log(''.charAt(123) === '')
