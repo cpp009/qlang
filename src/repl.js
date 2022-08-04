@@ -81,6 +81,7 @@ function char_stream(input = '') {
 
 
 function tokenizer(cs = char_stream('')) {
+    let cur
 
     function is_space(ch) {
         return /\s/.test(ch)
@@ -98,6 +99,10 @@ function tokenizer(cs = char_stream('')) {
         return /[_a-zA-Z0-9]/.test(ch)
     }
 
+    function is_op(ch) {
+        return '+'.includes(ch)
+    }
+
     function read_while(predic) {
         let str = ''
         while (!cs.eof() && predic(cs.peek())) {
@@ -113,20 +118,29 @@ function tokenizer(cs = char_stream('')) {
         }
         read_while(is_space)
         const ch = cs.peek()
+
+        let token
         if (is_num(ch)) {
             const value = read_while(is_num)
-            return {
+            token =  {
                 type: 'num',
                 value
             }
         } else if (is_id_start(ch)) {
-            return {
+            token =  {
                 type: 'id',
                 value: read_while(is_id)
             }
+        } else if(is_op) {
+            value = read_while(is_op)
+            token = {
+                type: 'op',
+                value
+            }
         }
 
-        return 'no';
+        cur = token
+        return token;
     }
 
     function peek() {
@@ -149,17 +163,6 @@ function tokenizer(cs = char_stream('')) {
         error
     }
 }
-
-
-const t = tokenizer(char_stream('123  1234'))
-
-while (!t.eof()) {
-    const i = t.next()
-    console.log(i)
-}
-
-
-
 
 //-------------------- parser --------------------
 
@@ -244,8 +247,8 @@ function make_lambda(element, parent_env) {
 }
 
 
-// const result = tokenize('123asdf')
 
-// console.log(result)
-
-//console.log(''.charAt(123) === '')
+module.exports = {
+    tokenizer,
+    char_stream,
+}
