@@ -1,6 +1,7 @@
 # qlang
 
+another cs lang practice
+
 
 ## TODO
-
-- JS PL reckless process
+- Simple scanner parser and evaluator

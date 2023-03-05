@@ -1,10 +1,6 @@
-const { parser } = require("./parser_test");
-const { char_stream, tokenizer } = require("./repl");
+const {Scanner} = require('./treewalk-inter/Scanner')
 
+const code = `123+456`
 
-
-const cs = char_stream('123 + 321 + 1000 + 23')
-const t = tokenizer(cs)
-const ast = parser(t)
-console.log(ast)
-
+const scan = Scanner(code)
+console.log(scan.scanTokens())
