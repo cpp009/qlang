@@ -6,6 +6,9 @@ const TokenType = {
   SLASH: 'SLASH',
   STAR: 'STAR',
   NUMBER: 'NUMBER',
+  STRING: 'STRING',
+  LEFT_PAREN: 'LEFT_PAREN',
+  RIGT_PAREN: 'RIGT_PAREN',
   EOF: 'EOF'
 }
 
@@ -54,6 +57,8 @@ function Scanner(code = '') {
       case '-': addToken(TokenType.MINUS); break;
       case '*': addToken(TokenType.STAR); break;
       case '/': addToken(TokenType.SLASH); break;
+      case '(': addToken(TokenType.LEFT_PAREN); break;
+      case ')': addToken(TokenType.RIGT_PAREN); break;
       default:
         // 
         if (isDigit(ch)) {
