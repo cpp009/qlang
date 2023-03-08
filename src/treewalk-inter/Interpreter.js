@@ -4,8 +4,14 @@ const { TokenType } = require("./Scanner")
 
 class Interpreter {
 
-  interpret(expr) {
-    return expr.accept(this)
+  interpret(stmts) {
+    for (const stmt of stmts) {
+      this.execute(stmt)
+    }
+  }
+
+  execute(stmt) {
+    stmt.accept(this)
   }
 
   visitLiteralExpr(expr) {
@@ -38,6 +44,17 @@ class Interpreter {
     }
 
     // Unreachable
+    return null
+  }
+
+  visitExpressionStmt(stmt) {
+    this.evaluate(stmt.expression)
+    return null;
+  }
+
+  visitPrintStmt(stmt) {
+    const value = this.evaluate(stmt.value)
+    console.log(value)
     return null
   }
 

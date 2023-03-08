@@ -33,6 +33,35 @@ class LiteralExpr {
   }
 }
 
+class Stmt {
+
+}
+
+
+class PrintStmt {
+  value
+
+  constructor(value) {
+    this.value = value
+  }
+
+  accept(visitor) {
+    return visitor.visitPrintStmt(this)
+  }
+}
+
+
+class ExpressionStmt {
+  expression
+
+  constructor(expression) {
+    this.expression = expression
+  }
+
+  accept(visitor) {
+    return visitor.visitExpressionStmt(this)
+  }
+}
 
 class GroupingExpr {
   expression
@@ -49,8 +78,30 @@ function Parser(source) {
   let current = 0
 
   function parse() {
+    const stmts = []
     current = 0
-    return expression()
+
+    while(!isAtEnd()) {
+      stmts.push(statement())
+    }
+    return stmts;
+  }
+
+  function statement() {
+    if (match(TokenType.PRINT)) return printStatement()
+    return expressionStatement()
+  }
+
+  function printStatement() {
+    const value = expression()
+    consume(TokenType.SEMICOLON, 'Expect ";" after value.')
+    return new PrintStmt(value)
+  }
+
+  function expressionStatement() {
+    const epxr = expression()
+    consume(TokenType.SEMICOLON, 'Expect ";" after expression.')
+    return new ExpressionStmt(epxr)
   }
 
   function expression() {
@@ -81,6 +132,7 @@ function Parser(source) {
     if (match(TokenType.NUMBER, TokenType.STRING)) {
       return new LiteralExpr(previous().value)
     }
+
 
     if (match(TokenType.LEFT_PAREN)) {
       const expr = expression()

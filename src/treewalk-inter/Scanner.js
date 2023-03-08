@@ -9,7 +9,17 @@ const TokenType = {
   STRING: 'STRING',
   LEFT_PAREN: 'LEFT_PAREN',
   RIGT_PAREN: 'RIGT_PAREN',
+  IDENTIFIER: 'IDENTIFIER',
+  SEMICOLON: 'SEMICOLON',
+  OR: 'OR',
+  PRINT: 'PRINT',
+  EQUAL: 'EQUAL',
   EOF: 'EOF'
+}
+
+const keywords = {
+  or: TokenType.OR,
+  print: TokenType.PRINT,
 }
 
 
@@ -59,22 +69,60 @@ function Scanner(code = '') {
       case '/': addToken(TokenType.SLASH); break;
       case '(': addToken(TokenType.LEFT_PAREN); break;
       case ')': addToken(TokenType.RIGT_PAREN); break;
+      case ';': addToken(TokenType.SEMICOLON); break;
+      case '=': 
+        if (peek() === '=') {
+
+        } else if (peek() === '>') {
+
+        } else if (peek() === '<'){
+
+        } else if (peek() == '=') {
+
+        } else {
+          addToken(TokenType.EQUAL)
+        }
+        break;
       default:
         // 
         if (isDigit(ch)) {
           number()
+        } else if (isAlpha(ch)) {
+          identifier()
         }
     }
   }
 
   function number() {
     while(isDigit(peek())) advance()
+
+    if (peek() === '.') {
+      advance()
+      while(isDigit(peek())) advance()
+    }
     const lexeme = code.slice(start, current)
     tokens.push(new Token(TokenType.NUMBER, lexeme, parseFloat(lexeme), line))
   }
 
+  function identifier() {
+    while(isAlphaOrDigit(peek())) advance()
+
+    const lexeme = code.slice(start, current)
+    let type = keywords[lexeme]
+    if (!type) type = TokenType.IDENTIFIER 
+    addToken(type)
+  }
+
   function isDigit(ch) {
     return ch >= '0' && ch <='9'
+  }
+
+  function isAlpha(ch) {
+    return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch === '_'
+  }
+
+  function isAlphaOrDigit(ch) {
+    return isAlpha(ch) || isDigit(ch)
   }
 
   function addToken(type) {
