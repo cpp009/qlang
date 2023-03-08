@@ -15,6 +15,11 @@ class BinaryExpr {
     this.operator = operator
     this.right = right
   }
+
+  accept(visitor){
+    return visitor.visitBinaryExpr(this)
+  }
+
 }
 
 class LiteralExpr {
@@ -22,13 +27,21 @@ class LiteralExpr {
   constructor(value) {
     this.value = value
   }
+
+  accept(visitor) {
+    return visitor.visitLiteralExpr(this)
+  }
 }
 
 
 class GroupingExpr {
-  expr
-  constructor(expr) {
-    this.expr = expr
+  expression
+  constructor(expression) {
+    this.expression = expression
+  }
+
+  accept(visitor) {
+    return visitor.visitGroupingExpr(this)
   }
 }
 
