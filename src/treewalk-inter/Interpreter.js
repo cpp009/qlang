@@ -2,7 +2,30 @@ const { TokenType } = require("./Scanner")
 
 
 
+class Env {
+  values = new Map()
+
+  get(key) {
+    if (this.values.has(key)) {
+      return this.values.get(key)
+    }
+
+    throw new Error('Undefined variable: "' + key + '".')
+  }
+
+  set(key, value) {
+    this.values.set(key, value)
+  }
+}
+
 class Interpreter {
+  env = new Env()
+
+  constructor(env) {
+    if (env) {
+      this.env = env
+    }
+  }
 
   interpret(stmts) {
     for (const stmt of stmts) {
@@ -54,8 +77,22 @@ class Interpreter {
 
   visitPrintStmt(stmt) {
     const value = this.evaluate(stmt.value)
-    console.log(value)
+    console.log(">>> " + value)
     return null
+  }
+
+  visitVar(stmt) {
+    const name = stmt.name
+    let value = null
+    if (stmt.initializer !== null) {
+      value = this.evaluate(stmt.initializer)
+    }
+    this.env.set(name.lexeme, value)
+  }
+
+  visitVariable(stmt) {
+    const name = stmt.name
+    return this.env.get(name.lexeme)
   }
 
   evaluate(expr) {
@@ -64,5 +101,6 @@ class Interpreter {
 }
 
 module.exports = {
-  Interpreter
+  Interpreter,
+  Env
 }

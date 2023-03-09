@@ -11,15 +11,17 @@ const TokenType = {
   RIGT_PAREN: 'RIGT_PAREN',
   IDENTIFIER: 'IDENTIFIER',
   SEMICOLON: 'SEMICOLON',
-  OR: 'OR',
   PRINT: 'PRINT',
   EQUAL: 'EQUAL',
+  VAR: 'VAR',
+  OR: 'OR',
   EOF: 'EOF'
 }
 
 const keywords = {
   or: TokenType.OR,
   print: TokenType.PRINT,
+  var: TokenType.VAR
 }
 
 

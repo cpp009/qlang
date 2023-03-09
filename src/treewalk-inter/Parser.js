@@ -16,7 +16,7 @@ class BinaryExpr {
     this.right = right
   }
 
-  accept(visitor){
+  accept(visitor) {
     return visitor.visitBinaryExpr(this)
   }
 
@@ -74,6 +74,33 @@ class GroupingExpr {
   }
 }
 
+
+class Var {
+  name
+  initializer
+
+  constructor(name, initializer) {
+    this.name = name
+    this.initializer = initializer
+  }
+
+  accept(visitor) {
+    visitor.visitVar(this)
+  }
+}
+
+class Variable {
+  name
+
+  constructor(name) {
+    this.name = name
+  }
+
+  accept(visitor) {
+    return visitor.visitVariable(this)
+  }
+}
+
 function Parser(source) {
   let current = 0
 
@@ -81,10 +108,26 @@ function Parser(source) {
     const stmts = []
     current = 0
 
-    while(!isAtEnd()) {
-      stmts.push(statement())
+    while (!isAtEnd()) {
+      stmts.push(declaration())
     }
     return stmts;
+  }
+
+  function declaration() {
+    if (match(TokenType.VAR)) return varDecl()
+    return statement()
+  }
+
+  function varDecl() {
+    const name = consume(TokenType.IDENTIFIER, 'Expect a identifier after "var"')
+
+    let initializer = null
+    if (match(TokenType.EQUAL)) {
+      initializer = expression()
+    }
+    consume(TokenType.SEMICOLON, 'Expect a ";" after declation')
+    return new Var(name, initializer)
   }
 
   function statement() {
@@ -133,6 +176,9 @@ function Parser(source) {
       return new LiteralExpr(previous().value)
     }
 
+    if (match(TokenType.IDENTIFIER)) {
+      return new Variable(previous())
+    }
 
     if (match(TokenType.LEFT_PAREN)) {
       const expr = expression()
@@ -160,7 +206,7 @@ function Parser(source) {
     }
     return false;
   }
-  
+
   function check(type) {
     return !isAtEnd() && peek().type === type
   }
@@ -169,7 +215,7 @@ function Parser(source) {
     return source[current].type === TokenType.EOF
   }
 
-  function peek()  {
+  function peek() {
     if (isAtEnd()) return null
     return source[current]
   }

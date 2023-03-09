@@ -1,6 +1,6 @@
 const { Parser } = require('./treewalk-inter/Parser')
 const { Scanner } = require('./treewalk-inter/Scanner')
-const { Interpreter } = require('./treewalk-inter/Interpreter')
+const { Interpreter, Env } = require('./treewalk-inter/Interpreter')
 
 const code = `(123+456)*10`
 
@@ -18,5 +18,7 @@ function test1(code) {
   // console.log(ret)
 }
 
-const code1 = `print 123 + 100.1;`
+const code1 = `var foo = 123;
+var bar = 321;
+print foo + bar;`
 test1(code1)
