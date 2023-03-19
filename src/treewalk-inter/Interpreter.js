@@ -70,6 +70,14 @@ class Interpreter {
     return null
   }
 
+  visitAssignExpr(expr) {
+    const name = expr.name
+    const value = this.evaluate(expr.value)
+
+    this.env.set(name.lexeme, value)
+  }
+
+
   visitExpressionStmt(stmt) {
     this.evaluate(stmt.expression)
     return null;

@@ -74,6 +74,20 @@ class GroupingExpr {
   }
 }
 
+class AssignExpr {
+  name
+  value
+
+  constructor(name, value) {
+    this.name = name
+    this.value = value
+  }
+
+  accept(visitor) {
+    visitor.visitAssignExpr(this)
+  }
+}
+
 
 class Var {
   name
@@ -148,7 +162,24 @@ function Parser(source) {
   }
 
   function expression() {
-    return term()
+    return assignment()
+  }
+
+  function assignment() {
+    const expr = term()
+    console.log(expr)
+    if (match(TokenType.EQUAL)) {
+      const equals = previous()
+      const value = assignment()
+
+      if (expr instanceof Variable) {
+        const nameToken = expr.name
+        return new AssignExpr(nameToken, value)
+      }
+
+      throw new Error('Invalid assignment target')
+    }
+    return expr
   }
 
   function term() {

@@ -20,5 +20,6 @@ function test1(code) {
 
 const code1 = `var foo = 123;
 var bar = 321;
+bar = 123;
 print foo + bar;`
 test1(code1)
