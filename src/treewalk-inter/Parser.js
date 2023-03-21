@@ -63,6 +63,18 @@ class ExpressionStmt {
   }
 }
 
+class BlockStmt {
+  statements = []
+
+  constructor(statements) {
+    this.statements = statements
+  }
+
+  accept(visitor) {
+    return visitor.visitBlockStmt(this);
+  }
+}
+
 class GroupingExpr {
   expression
   constructor(expression) {
@@ -146,6 +158,12 @@ function Parser(source) {
 
   function statement() {
     if (match(TokenType.PRINT)) return printStatement()
+    if (match(TokenType.LEFT_BRACE)) {
+      const b =  block()
+      consume(TokenType.RIGT_BRACE, 'Expect a "}" after block')
+      return new BlockStmt(b)
+    }
+
     return expressionStatement()
   }
 
@@ -167,7 +185,6 @@ function Parser(source) {
 
   function assignment() {
     const expr = term()
-    console.log(expr)
     if (match(TokenType.EQUAL)) {
       const equals = previous()
       const value = assignment()
@@ -220,12 +237,20 @@ function Parser(source) {
     throw new Error('Unexpect token: ' + peek().type)
   }
 
+  function block() {
+    const stmts = []
+    while(!isAtEnd() && !check(TokenType.RIGT_BRACE)) {
+      stmts.push(declaration())
+    }
+    return stmts
+  }
+
   function consume(type, reason) {
     if (check(type)) {
       return advance()
     }
 
-    throw new Error(reason)
+    throw new Error(reason + 'but "' + peek().type + '"')
   }
 
   function match(...types) {

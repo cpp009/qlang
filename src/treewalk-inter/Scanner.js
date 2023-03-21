@@ -9,6 +9,8 @@ const TokenType = {
   STRING: 'STRING',
   LEFT_PAREN: 'LEFT_PAREN',
   RIGT_PAREN: 'RIGT_PAREN',
+  LEFT_BRACE: 'LEFT_BRACE',
+  RIGT_BRACE: 'RIGT_BRACE',
   IDENTIFIER: 'IDENTIFIER',
   SEMICOLON: 'SEMICOLON',
   PRINT: 'PRINT',
@@ -71,6 +73,8 @@ function Scanner(code = '') {
       case '/': addToken(TokenType.SLASH); break;
       case '(': addToken(TokenType.LEFT_PAREN); break;
       case ')': addToken(TokenType.RIGT_PAREN); break;
+      case '{': addToken(TokenType.LEFT_BRACE); break;
+      case '}': addToken(TokenType.RIGT_BRACE); break;
       case ';': addToken(TokenType.SEMICOLON); break;
       case '=': 
         if (peek() === '=') {
