@@ -8,21 +8,21 @@ function test1(code) {
   const scan = Scanner(code)
   const tokens = scan.scanTokens()
 
-  // console.log(tokens)
   const parser = Parser(tokens)
   const ast = parser.parse()
-  // console.log(ast)
+  console.log(ast)
+  return 
   const interpreter = new Interpreter()
   const ret = interpreter.interpret(ast)
   console.log(ret)
 }
 
-const code1 = `var foo = 123;
-var bar = 321;
-bar = 123;
-{
-  var foo = 100;
-  print bar + foo;
+const code1 = `
+var foo = true;
+if (foo) {
+  print 123;
+} else {
+  print 321;
 }
-print foo + bar;`
+`
 test1(code1)

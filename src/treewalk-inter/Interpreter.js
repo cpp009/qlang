@@ -113,6 +113,16 @@ class Interpreter {
     return null
   }
 
+  visitIfStmt(stmt) {
+    if (isTrue(this.evaluate(stmt.condition))) {
+      return this.executeBlock(stat.thenBranch)
+    } else if (stmt.elseBranch) {
+      return this.executeBlock(stat.elseBranch)
+    }
+  }
+
+  isTrue
+
   visitVar(stmt) {
     const name = stmt.name
     let value = null

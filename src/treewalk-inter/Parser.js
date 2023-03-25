@@ -75,6 +75,22 @@ class BlockStmt {
   }
 }
 
+class IfStmt {
+  condition
+  thenBranch
+  elseBranch
+
+  constructor(condition, thenBranch, elseBranch) {
+    this.condition = condition
+    this.thenBranch = thenBranch
+    this.elseBranch = elseBranch
+  }
+
+  accept(visitor) {
+    visitor.visitIfStmt(this)
+  }
+}
+
 class GroupingExpr {
   expression
   constructor(expression) {
@@ -157,9 +173,10 @@ function Parser(source) {
   }
 
   function statement() {
+    if (match(TokenType.IF)) return ifStatement()
     if (match(TokenType.PRINT)) return printStatement()
     if (match(TokenType.LEFT_BRACE)) {
-      const b =  block()
+      const b = block()
       consume(TokenType.RIGT_BRACE, 'Expect a "}" after block')
       return new BlockStmt(b)
     }
@@ -177,6 +194,19 @@ function Parser(source) {
     const epxr = expression()
     consume(TokenType.SEMICOLON, 'Expect ";" after expression.')
     return new ExpressionStmt(epxr)
+  }
+
+  function ifStatement() {
+      consume(TokenType.LEFT_PAREN, 'Expect a "(" after if')
+      const condition = expression()
+      consume(TokenType.RIGT_PAREN, 'Expect a ")" after if condition')
+      const thenBranch = statement()
+      let elseBranch = null
+      if (match(TokenType.ELSE)) {
+        elseBranch = statement()
+      }
+
+      return new IfStmt(condition, thenBranch, elseBranch)
   }
 
   function expression() {
@@ -239,7 +269,7 @@ function Parser(source) {
 
   function block() {
     const stmts = []
-    while(!isAtEnd() && !check(TokenType.RIGT_BRACE)) {
+    while (!isAtEnd() && !check(TokenType.RIGT_BRACE)) {
       stmts.push(declaration())
     }
     return stmts
@@ -250,7 +280,7 @@ function Parser(source) {
       return advance()
     }
 
-    throw new Error(reason + 'but "' + peek().type + '"')
+    throw new Error(reason + ' but "' + peek().type + '", at line: '+ peek().line)
   }
 
   function match(...types) {

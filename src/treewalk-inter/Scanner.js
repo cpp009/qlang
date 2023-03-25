@@ -16,6 +16,8 @@ const TokenType = {
   PRINT: 'PRINT',
   EQUAL: 'EQUAL',
   VAR: 'VAR',
+  IF: 'IF',
+  ELSE: 'ELSE',
   OR: 'OR',
   EOF: 'EOF'
 }
@@ -23,7 +25,9 @@ const TokenType = {
 const keywords = {
   or: TokenType.OR,
   print: TokenType.PRINT,
-  var: TokenType.VAR
+  var: TokenType.VAR,
+  if: TokenType.IF,
+  else: TokenType.ELSE
 }
 
 
